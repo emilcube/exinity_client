@@ -101,7 +101,7 @@ void production() {
 			std::string resp;
 			auto status = sock->Read(resp);
 			if (!status) break;
-			std::cout << "response: " << resp << std::endl;//
+			std::cout << "response: " << resp << std::endl;// //
 		}
 	}
 }
