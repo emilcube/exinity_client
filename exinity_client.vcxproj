@@ -156,6 +156,7 @@
     <ClInclude Include="Logger\BasicLogger.hpp" />
     <ClInclude Include="Logger\Logger.hpp" />
     <ClInclude Include="Socket.hpp" />
+    <ClInclude Include="Utils.hpp" />
     <ClInclude Include="WebSocket.hpp" />
     <ClInclude Include="WebSocketFactory.hpp" />
   </ItemGroup>

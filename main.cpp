@@ -1,16 +1,8 @@
 #include <iostream>
 #include "WebSocketFactory.hpp"
 #include "Logger/BasicLogger.hpp"
-
-// thread-safe generator
-int intRand(const int& min, const int& max) {
-	static thread_local std::mt19937* generator = nullptr;
-	if (!generator) generator = new std::mt19937(clock() + std::hash<std::thread::id>()(std::this_thread::get_id()));
-	//std::hash<std::thread::id>()(std::this_thread::get_id())
-	//this_thread::get_id().hash()
-	std::uniform_int_distribution<int> distribution(min, max);
-	return distribution(*generator);
-}
+#include <filesystem>
+#include "Utils.hpp"
 
 void for_tests() {
 
@@ -23,7 +15,7 @@ void for_tests() {
 		std::thread th([&message_every_n_sec,&i]() {
 
 		std::shared_ptr<BasicLogger> logger = std::make_shared<BasicLogger>();
-		logger->AssignFiles("sock_client_log_"+std::to_string(i) + ".log");
+		logger->AssignFiles("sock_client_"+std::to_string(i) + ".log");
 		WebSocketFactory::SetDefaultLogger(logger);
 
 		net::io_context ioc;
@@ -58,8 +50,9 @@ void for_tests() {
 }
 
 void production() {
+	Logger::initializeLog();
 	std::shared_ptr<BasicLogger> logger = std::make_shared<BasicLogger>();
-	logger->AssignFiles("sock_client_log.log");
+	logger->AssignFiles("sock_client.log");
 	WebSocketFactory::SetDefaultLogger(logger);
 
 	auto host = "ws://127.0.0.1";
@@ -95,12 +88,14 @@ void production() {
 
 			if (getres == std::string("close")) {
 				closed = true;
+				sock->Close();
 				break;
 			}
 			if (!sock->IsOpen()) break;
 			std::string resp;
 			auto status = sock->Read(resp);
 			if (!status) break;
+			Logger::log({ getres, resp });
 			std::cout << "response: " << resp << std::endl;// //
 		}
 	}
